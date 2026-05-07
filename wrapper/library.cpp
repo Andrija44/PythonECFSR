@@ -10,14 +10,20 @@
 namespace py = boost::python;
 namespace np = boost::python::numpy;
 
+enum class ModelType {
+    TREE_MODEL,
+    AP_MODEL
+};
+
 class ECFWrap {
 private:
     StateP state;
     ModelP model;
     int argc;
     char **argv;
+    ModelType model_type_;
 public:
-    ECFWrap() {
+    ECFWrap(ModelType model_type = ModelType::TREE_MODEL) : model_type_(model_type) {
         argc = 2;
 
         argv = new char*[2];
@@ -47,6 +53,10 @@ public:
         return model->getSize();
     }
 
+    ModelType getModelType() const {
+        return model_type_;
+    }
+
     void fit(np::ndarray X, np::ndarray y, bool linearScaling) {
         uint nSamples = X.shape(0), nFeatures = X.shape(1);
         std::vector<std::vector<double>> domain;
@@ -66,8 +76,18 @@ public:
         }
 
         state = StateP(new State);
-        model = std::make_shared<TreeModel>(nSamples, nFeatures, domain, codomain, linearScaling);
 
+        switch (model_type_) {
+            case ModelType::TREE_MODEL:
+                model = std::make_shared<TreeModel>(nSamples, nFeatures, domain, codomain, linearScaling);
+                break;
+            case ModelType::AP_MODEL:
+                model = std::make_shared<APModel>(nSamples, nFeatures, domain, codomain, linearScaling);
+                break;
+            default:
+                throw std::invalid_argument("Invalid model type");
+        }
+        
         state->setEvalOp(model);
 
         state->initialize(argc, argv);
@@ -103,11 +123,17 @@ public:
 
 BOOST_PYTHON_MODULE(ecf_wrap) {
     np::initialize();
-    py::class_<ECFWrap, std::shared_ptr<ECFWrap> >("ECFWrap", py::init<>())
-            .def("getString", &ECFWrap::getString)
-            .def("getSize", &ECFWrap::getSize)
-            .def("fit", &ECFWrap::fit)
-            .def("predict", &ECFWrap::predict)
-            .def("setPath", &ECFWrap::setPath)
-            .def("getPath", &ECFWrap::getPath);
+    
+    py::enum_<ModelType>("ModelType")
+        .value("TREE_MODEL", ModelType::TREE_MODEL)
+        .value("AP_MODEL", ModelType::AP_MODEL);
+    
+    py::class_<ECFWrap, std::shared_ptr<ECFWrap> >("ECFWrap", py::init<ModelType>(py::arg("model_type") = ModelType::TREE_MODEL))
+        .def("getString", &ECFWrap::getString)
+        .def("getSize", &ECFWrap::getSize)
+        .def("getModelType", &ECFWrap::getModelType)
+        .def("fit", &ECFWrap::fit)
+        .def("predict", &ECFWrap::predict)
+        .def("setPath", &ECFWrap::setPath)
+        .def("getPath", &ECFWrap::getPath);
 }

@@ -21,6 +21,7 @@ public:
 
     // metode
     virtual int getSize() = 0;
+    FitnessP evaluate(IndividualP individual);
     virtual void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain) = 0; // abstraktna, hence = 0
     void setGenotype(GenotypeP genotype) { genotype_ = genotype; }
     GenotypeP getGenotype() { return genotype_; }
@@ -47,7 +48,7 @@ typedef std::shared_ptr<Model> ModelP;
 
 // GP
 class TreeModel : public Model {
-private:
+protected:
     std::vector<std::string> terminal_names_;
 public:
     // konstruktor
@@ -55,9 +56,8 @@ public:
             const std::vector<double>& codomain, bool linearScaling) : Model(nSamples, nFeatures, domain, codomain, linearScaling) {}
 
     // metode
+    bool initialize(StateP state);
 	void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain);
-    FitnessP evaluate(IndividualP individual);
-    bool initialize(StateP);
     int getSize() override {
         Tree::Tree* tree = (Tree::Tree*) this->genotype_.get();
         return tree->size();
@@ -65,16 +65,36 @@ public:
 };
 typedef std::shared_ptr<TreeModel> TreeModelP;
 
+// AP
+class APModel : public TreeModel {
+public:
+    // konstruktor
+    APModel(uint nSamples, uint nFeatures, const std::vector<std::vector<double>>& domain,
+            const std::vector<double>& codomain, bool linearScaling) : TreeModel(nSamples, nFeatures, domain, codomain, linearScaling) {}
+
+    // metode
+    void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain);
+    int getSize() override {
+        Tree::Tree* tree = (Tree::Tree*) ((Tree::APGenotype*) this->genotype_.get())->convertToPhenotype();
+        return tree->size();
+    }
+};
+typedef std::shared_ptr<APModel> APModelP;
+
 // CGP
 // class CGPModel : public Model {
 // public:
-//     // konstruktori
-//     CGPModel() : Model() {}
-//     CGPModel(GenotypeP genotype) : Model(genotype) {}
+//     // konstruktor
+//     CGPModel(uint nSamples, uint nFeatures, const std::vector<std::vector<double>>& domain,
+//             const std::vector<double>& codomain, bool linearScaling) : Model(nSamples, nFeatures, domain, codomain, linearScaling) {}
 
 //     // metode
-//     void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain);
 //     FitnessP evaluate(IndividualP individual);
+//     void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain);
+//     int getSize() override {
+//         Cartesian::Cartesian* cartesian = (Cartesian::Cartesian*) this->genotype_.get();
+//         return cartesian->size();
+//     }
 // };
 // typedef std::shared_ptr<CGPModel> CGPModelP;
 
