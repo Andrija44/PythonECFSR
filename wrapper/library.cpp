@@ -12,7 +12,9 @@ namespace np = boost::python::numpy;
 
 enum class ModelType {
     TREE_MODEL,
-    AP_MODEL
+    AP_MODEL,
+    GEP_MODEL,
+    CGP_MODEL
 };
 
 class ECFWrap {
@@ -84,6 +86,12 @@ public:
             case ModelType::AP_MODEL:
                 model = std::make_shared<APModel>(nSamples, nFeatures, domain, codomain, linearScaling);
                 break;
+            case ModelType::GEP_MODEL:
+                model = std::make_shared<GEPModel>(nSamples, nFeatures, domain, codomain, linearScaling);
+                break;
+            case ModelType::CGP_MODEL:
+                model = std::make_shared<CGPModel>(nSamples, nFeatures, domain, codomain, linearScaling);
+                break;
             default:
                 throw std::invalid_argument("Invalid model type");
         }
@@ -126,7 +134,9 @@ BOOST_PYTHON_MODULE(ecf_wrap) {
     
     py::enum_<ModelType>("ModelType")
         .value("TREE_MODEL", ModelType::TREE_MODEL)
-        .value("AP_MODEL", ModelType::AP_MODEL);
+        .value("AP_MODEL", ModelType::AP_MODEL)
+        .value("GEP_MODEL", ModelType::GEP_MODEL)
+        .value("CGP_MODEL", ModelType::CGP_MODEL);
     
     py::class_<ECFWrap, std::shared_ptr<ECFWrap> >("ECFWrap", py::init<ModelType>(py::arg("model_type") = ModelType::TREE_MODEL))
         .def("getString", &ECFWrap::getString)

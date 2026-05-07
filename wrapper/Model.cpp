@@ -89,31 +89,24 @@ void APModel::execute(GenotypeP genotype, std::vector<double> &results, std::vec
     }
 }
 
-// FitnessP CGPModel::evaluate(IndividualP individual) {
-//     FitnessP fitness(new FitnessMin);
+void GEPModel::execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain) {
+    GEPChromosomeP gep = std::static_pointer_cast<GEP::GEPChromosome> (genotype);
 
-//     vector<double> results(nSamples);
+    gep->assemble();
 
-//     execute(individual->getGenotype(), results, domain);
-//     computeLinearScaling(results);
+    for(uint i = 0; i < domain.size(); i++) {
+        for(uint j = 0; j < nFeatures; j++)
+            gep->setTerminalValue(this->terminal_names_[j], &domain[i][j]);
+        gep->execute(&results[i]);
+    }
+}
 
-//     double score = 0;
-//     for(uint i = 0; i < nSamples; i++) {
-//         double result = a * results[i] + b;
-//         score += fabs(codomain[i] - result);
-//     }
-//     fitness->setValue(score);
+void CGPModel::execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain) {
+	Cartesian::Cartesian* cartesian = (Cartesian::Cartesian*) genotype.get();
 
-//     return fitness;
-// }
-
-// // implementacija CGPModel klase
-// void CGPModel::execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain) {
-// 	Cartesian::Cartesian* cartesian = (Cartesian::Cartesian*) genotype.get();
-
-//     for(uint i = 0; i < domain.size(); i++) {
-//         std::vector<double> result;
-//         cartesian->evaluate(domain[i], result);
-//         results[i] = result[0];
-//     }
-// }
+    for(uint i = 0; i < domain.size(); i++) {
+        std::vector<double> result;
+        cartesian->evaluate(domain[i], result);
+        results[i] = result[0];
+    }
+}

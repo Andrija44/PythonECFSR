@@ -46,7 +46,6 @@ public:
 };
 typedef std::shared_ptr<Model> ModelP;
 
-// GP
 class TreeModel : public Model {
 protected:
     std::vector<std::string> terminal_names_;
@@ -65,7 +64,6 @@ public:
 };
 typedef std::shared_ptr<TreeModel> TreeModelP;
 
-// AP
 class APModel : public TreeModel {
 public:
     // konstruktor
@@ -81,22 +79,35 @@ public:
 };
 typedef std::shared_ptr<APModel> APModelP;
 
-// CGP
-// class CGPModel : public Model {
-// public:
-//     // konstruktor
-//     CGPModel(uint nSamples, uint nFeatures, const std::vector<std::vector<double>>& domain,
-//             const std::vector<double>& codomain, bool linearScaling) : Model(nSamples, nFeatures, domain, codomain, linearScaling) {}
+class GEPModel : public TreeModel {
+public:
+    // konstruktor
+    GEPModel(uint nSamples, uint nFeatures, const std::vector<std::vector<double>>& domain,
+            const std::vector<double>& codomain, bool linearScaling) : TreeModel(nSamples, nFeatures, domain, codomain, linearScaling) {}
 
-//     // metode
-//     FitnessP evaluate(IndividualP individual);
-//     void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain);
-//     int getSize() override {
-//         Cartesian::Cartesian* cartesian = (Cartesian::Cartesian*) this->genotype_.get();
-//         return cartesian->size();
-//     }
-// };
-// typedef std::shared_ptr<CGPModel> CGPModelP;
+    // metode
+    void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain);
+    int getSize() override {
+        GEPChromosomeP gep = std::static_pointer_cast<GEP::GEPChromosome> (this->genotype_);
+        return gep->size();
+    }
+};
+typedef std::shared_ptr<GEPModel> GEPModelP;
+
+class CGPModel : public Model {
+public:
+    // konstruktor
+    CGPModel(uint nSamples, uint nFeatures, const std::vector<std::vector<double>>& domain,
+            const std::vector<double>& codomain, bool linearScaling) : Model(nSamples, nFeatures, domain, codomain, linearScaling) {}
+
+    // metode
+    void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain);
+    int getSize() override {
+        Cartesian::Cartesian* cartesian = (Cartesian::Cartesian*) this->genotype_.get();
+        return cartesian->size();
+    }
+};
+typedef std::shared_ptr<CGPModel> CGPModelP;
 
 
 #endif // Model_hpp
