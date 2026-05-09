@@ -22,7 +22,7 @@ parameters = """
 """
 
 class ECFTree(ECFBaseRegressor):
-    def __init__(self, functionset="+ - *", maxdepth=4, terminalset="1 [-1 1]",
+    def __init__(self, functionset="+ - * / min max", maxdepth=6, terminalset="1 [-1 1]",
                 mutation_indprob=0.3, population_size=500, term_stagnation=20, term_fitnessval=0,
                 linear_scaling=True):
         super().__init__(parameters, ModelType.TREE_MODEL)
@@ -37,11 +37,15 @@ class ECFTree(ECFBaseRegressor):
     
     def fit(self, X, y):
         X, y = check_X_y(X, y)
-        l = [self.terminalset]
+        l = []
         for i in range(X.shape[1]):
             l.append(f'x{i}')
+        l.append(self.terminalset)
         real_terminalset = ' '.join(l)
 
         self.parameters = self.parameters.format(**self.get_params(), real_terminalset=real_terminalset)
         
         super().fit(X, y)
+
+    def get_model(self):
+        return super().get_model().replace("D_", "")

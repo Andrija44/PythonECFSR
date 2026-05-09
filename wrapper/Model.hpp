@@ -11,7 +11,6 @@ protected:
 	std::vector<double> codomain;
     bool linearScaling;
     double a, b;
-
 public:
     // konstruktor
     Model(uint nSamples, uint nFeatures, const std::vector<std::vector<double>> domain,
@@ -20,35 +19,30 @@ public:
     virtual ~Model() = default;
 
     // metode
-    virtual int getSize() = 0;
     FitnessP evaluate(IndividualP individual);
-    virtual void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain) = 0; // abstraktna, hence = 0
-    void setGenotype(GenotypeP genotype) { genotype_ = genotype; }
     GenotypeP getGenotype() { return genotype_; }
+    void setGenotype(GenotypeP genotype) { genotype_ = genotype; }
     double getA() { return a; }
     double getB() { return b; }
     void computeLinearScaling(std::vector<double> &results);
-
-    std::string getString() {
-        std::string output = genotype_->toString();
-        if (linearScaling)
-            output = to_string(b) + "+" + to_string(a) + "*(" + output + ")";
-
-        return output;
-    }
-    void predict(std::vector<double> &results, std::vector<std::vector<double>> &new_domain) {
+    void computeLinearScaling() {
         std::vector<double> temp_results(nSamples);
         execute(this->genotype_, temp_results, this->domain);
         computeLinearScaling(temp_results);
-
-        execute(this->genotype_, results, new_domain);
     }
+    void predict(std::vector<double> &results, std::vector<std::vector<double>> &new_domain) { execute(this->genotype_, results, new_domain); }
+    
+    // abstraktne metode
+    virtual void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain) = 0;
+    virtual std::string getString() = 0;
+    virtual int getSize() = 0;
 };
 typedef std::shared_ptr<Model> ModelP;
 
 class TreeModel : public Model {
 protected:
     std::vector<std::string> terminal_names_;
+    int getString(TreeP tree, int index, std::string& result);
 public:
     // konstruktor
     TreeModel(uint nSamples, uint nFeatures, const std::vector<std::vector<double>>& domain,
@@ -56,43 +50,14 @@ public:
 
     // metode
     bool initialize(StateP state);
-	void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain);
+	void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain) override;
+    std::string getString() override;
     int getSize() override {
         Tree::Tree* tree = (Tree::Tree*) this->genotype_.get();
         return tree->size();
     }
 };
 typedef std::shared_ptr<TreeModel> TreeModelP;
-
-class APModel : public TreeModel {
-public:
-    // konstruktor
-    APModel(uint nSamples, uint nFeatures, const std::vector<std::vector<double>>& domain,
-            const std::vector<double>& codomain, bool linearScaling) : TreeModel(nSamples, nFeatures, domain, codomain, linearScaling) {}
-
-    // metode
-    void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain);
-    int getSize() override {
-        Tree::Tree* tree = (Tree::Tree*) ((Tree::APGenotype*) this->genotype_.get())->convertToPhenotype();
-        return tree->size();
-    }
-};
-typedef std::shared_ptr<APModel> APModelP;
-
-class GEPModel : public TreeModel {
-public:
-    // konstruktor
-    GEPModel(uint nSamples, uint nFeatures, const std::vector<std::vector<double>>& domain,
-            const std::vector<double>& codomain, bool linearScaling) : TreeModel(nSamples, nFeatures, domain, codomain, linearScaling) {}
-
-    // metode
-    void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain);
-    int getSize() override {
-        GEPChromosomeP gep = std::static_pointer_cast<GEP::GEPChromosome> (this->genotype_);
-        return gep->size();
-    }
-};
-typedef std::shared_ptr<GEPModel> GEPModelP;
 
 class CGPModel : public Model {
 public:
@@ -101,7 +66,8 @@ public:
             const std::vector<double>& codomain, bool linearScaling) : Model(nSamples, nFeatures, domain, codomain, linearScaling) {}
 
     // metode
-    void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain);
+    void execute(GenotypeP genotype, std::vector<double> &results, std::vector<std::vector<double>> &domain) override;
+    std::string getString() override;
     int getSize() override {
         Cartesian::Cartesian* cartesian = (Cartesian::Cartesian*) this->genotype_.get();
         return cartesian->size();
@@ -109,5 +75,21 @@ public:
 };
 typedef std::shared_ptr<CGPModel> CGPModelP;
 
+// primjer podklase za odreden model
+// class TemplateModel : public Model {
+// public:
+//     // konstruktor
+//     TemplateModel(uint nSamples, uint nFeatures, const std::vector<std::vector<double>>& domain,
+//             const std::vector<double>& codomain, bool linearScaling) :
+//             Model(nSamples, nFeatures, domain, codomain, linearScaling) {} // osnovni konstruktor, po potrebi moguce napraviti svoj
+//
+//     // metode
+//     bool initialize(StateP state); // opcionalna funckija koja se odvija prije pokretanja treniranja
+//     FitnessP evaluate(IndividualP individual); // opcionalna funkcija, osnovna od Model klase bi trebala biti dovoljno dobra za simbolicku regresiju
+//     void execute(GenotypeP genotype, std::vector<double> &results,
+//         std::vector<std::vector<double>> &domain) override; // glavna funkcija u kojoj se ulazni podaci postavljaju na ulaz genotipa i provlace kroz njega
+//     std::string getString() override; // funkcija koja vraca string kompatabilan s sympy paketom za this->genotype_
+//     int getSize() override; // funkcija koja vraca velicinu modela
+// };
 
 #endif // Model_hpp

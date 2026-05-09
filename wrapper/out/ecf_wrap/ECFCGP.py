@@ -25,7 +25,7 @@ parameters = """
 """
 
 class ECFCGP(ECFBaseRegressor):
-    def __init__(self, numvariables=3, numoutputs=1, numrows=2, numcols=5, levelsback=3, functionset="+ * - / pos min max",
+    def __init__(self, numvariables=3, numoutputs=1, numrows=5, numcols=10, levelsback=4, functionset="+ * - / min max",
                 mutation_indprob=0.7, population_size=1000, term_maxgen=50, term_fitnessval=0, linear_scaling=True):
         super().__init__(parameters, ModelType.CGP_MODEL)
         self.numvariables = numvariables
