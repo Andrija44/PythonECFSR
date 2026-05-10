@@ -3,13 +3,13 @@ import tempfile
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 
-from ecf_wrap import ECFWrap, ModelType
+from ecf_sr import ECF, ModelType
 
 class ECFBaseRegressor(BaseEstimator, RegressorMixin):
     def __init__(self, parameters: str, model_type=ModelType.TREE_MODEL):
         self.parameters = parameters
         self.model_type = model_type
-        self.impl = ECFWrap(self.model_type)
+        self.impl = ECF(self.model_type)
 
     def fit(self, X, y):
         X, y = check_X_y(X, y)

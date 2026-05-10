@@ -16,7 +16,7 @@ enum class ModelType {
     // TEMPLATE_MODEL
 };
 
-class ECFWrap {
+class ECFSR {
 private:
     StateP state;
     ModelP model;
@@ -24,7 +24,7 @@ private:
     char **argv;
     ModelType model_type_;
 public:
-    ECFWrap(ModelType model_type = ModelType::TREE_MODEL) : model_type_(model_type) {
+    ECFSR(ModelType model_type = ModelType::TREE_MODEL) : model_type_(model_type) {
         argc = 2;
 
         argv = new char*[2];
@@ -32,7 +32,7 @@ public:
         argv[1] = new char[256];
     }
 
-    ~ECFWrap() {
+    ~ECFSR() {
         delete argv[1];
         delete argv[0];
         delete argv;
@@ -126,7 +126,7 @@ public:
     }
 };
 
-BOOST_PYTHON_MODULE(ecf_wrap) {
+BOOST_PYTHON_MODULE(ecf_sr) {
     np::initialize();
     
     py::enum_<ModelType>("ModelType")
@@ -134,12 +134,12 @@ BOOST_PYTHON_MODULE(ecf_wrap) {
         .value("CGP_MODEL", ModelType::CGP_MODEL);
         // .value("TEMPLATE_MODEL", ModelType::TEMPLATE_MODEL);
     
-    py::class_<ECFWrap, std::shared_ptr<ECFWrap> >("ECFWrap", py::init<ModelType>(py::arg("model_type") = ModelType::TREE_MODEL))
-        .def("getString", &ECFWrap::getString)
-        .def("getSize", &ECFWrap::getSize)
-        .def("getModelType", &ECFWrap::getModelType)
-        .def("fit", &ECFWrap::fit)
-        .def("predict", &ECFWrap::predict)
-        .def("setPath", &ECFWrap::setPath)
-        .def("getPath", &ECFWrap::getPath);
+    py::class_<ECFSR, std::shared_ptr<ECFSR> >("ECF", py::init<ModelType>(py::arg("model_type") = ModelType::TREE_MODEL))
+        .def("getString", &ECFSR::getString)
+        .def("getSize", &ECFSR::getSize)
+        .def("getModelType", &ECFSR::getModelType)
+        .def("fit", &ECFSR::fit)
+        .def("predict", &ECFSR::predict)
+        .def("setPath", &ECFSR::setPath)
+        .def("getPath", &ECFSR::getPath);
 }
