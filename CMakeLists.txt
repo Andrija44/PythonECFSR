@@ -5,4 +5,4 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_BUILD_TYPE "Release")
 
 add_subdirectory(ECF)
-add_subdirectory(ecf-sr)
+add_subdirectory(wrapper)

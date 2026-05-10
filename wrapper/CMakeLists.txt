@@ -18,10 +18,8 @@ set_target_properties(ecf-sr PROPERTIES PREFIX "" OUTPUT_NAME "ecf_sr")
 
 if(WIN32)
     set_target_properties(ecf-sr PROPERTIES SUFFIX ".pyd")
-    set(ecf_path ${CMAKE_CURRENT_SOURCE_DIR}/../ECF/build/Release/libECF.a)
 else()
     set_target_properties(ecf-sr PROPERTIES SUFFIX ".so")
-    set(ecf_path ${CMAKE_CURRENT_SOURCE_DIR}/../ECF/build/libECF.a)
 endif()
 
 target_link_libraries(ecf-sr PRIVATE
@@ -29,7 +27,7 @@ target_link_libraries(ecf-sr PRIVATE
     Python::NumPy
     Boost::python${pyver_short}
     Boost::numpy${pyver_short}
-    ${ecf_path}
+    ECF
 )
 
 install(TARGETS ecf-sr DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/lib/ecf_sr)
