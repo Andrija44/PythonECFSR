@@ -1,4 +1,5 @@
 import tempfile
+import os
 
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
@@ -15,12 +16,16 @@ class ECFBaseRegressor(BaseEstimator, RegressorMixin):
         X, y = check_X_y(X, y)
         self.n_features_in_ = X.shape[1]
 
-        with tempfile.NamedTemporaryFile(mode="w") as f:
+        f = tempfile.NamedTemporaryFile(mode="w", delete=False)
+        try:
             f.write(self.parameters)
             f.flush()
+            f.close()
             self.impl.setPath(f.name)
             self.impl.fit(X, y, self.linear_scaling)
             self.fitted_ = True
+        finally:
+            os.unlink(f.name)
         return self
 
     def predict(self, X):

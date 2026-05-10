@@ -1,0 +1,15 @@
+name: ecf
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - boost
+  - cmake>=3.17
+  - python=3.*
+  - setuptools
+  - binutils
+  - scikit-learn
+  - pip
+  - pip:
+    - numpy>=1.14.3
+    - scikit-learn>=1.8.0
