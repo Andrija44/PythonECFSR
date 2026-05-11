@@ -5,7 +5,7 @@ channels:
 dependencies:
   - boost
   - cmake>=3.17
-  - python=3.*
+  - python>=3.11
   - setuptools
   - binutils
   - scikit-learn
