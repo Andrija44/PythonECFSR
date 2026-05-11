@@ -52,6 +52,8 @@ pip install ./wrapper/lib
 
 Nakon što ste uspješno instalirali biblioteku _ecf_sr_ možete ju isprobati pokretanjem datoteke [test.py](test.py) (`python test.py`) koja bi trebala ispisati dvije različite formule i veličinu modela.
 
+Ako radite ikakve promjene na projektu, na raspolaganju je i skripta [build.sh](wrapper/build.sh)/[build.bat](wrapper/build.bat) koja se može upotrijebiti za ponovno instaliranje paketa bez ponovnog povlačenja ECF biblioteke.
+
 ## Uporaba
 
 Biblioteku _ecf_sr_ je moguće koristiti kroz interaktivni terminal Python-a ili kreiranjem i pokretanjem .py datoteke.\
