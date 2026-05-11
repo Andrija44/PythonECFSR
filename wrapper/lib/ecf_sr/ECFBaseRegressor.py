@@ -7,9 +7,10 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from ecf_sr import ECF, ModelType
 
 class ECFBaseRegressor(BaseEstimator, RegressorMixin):
-    def __init__(self, parameters: str, model_type=ModelType.TREE_MODEL):
+    def __init__(self, parameters: str, model_type=ModelType.TREE_MODEL, linear_scaling=True):
         self.parameters = parameters
         self.model_type = model_type
+        self.linear_scaling = linear_scaling
         self.impl = ECF(self.model_type)
 
     def fit(self, X, y):

@@ -10,7 +10,11 @@ set(pyver_short ${Python_VERSION_MAJOR}${Python_VERSION_MINOR})
 find_package(Boost CONFIG REQUIRED COMPONENTS python${pyver_short} numpy${pyver_short})
 include_directories(${Boost_INCLUDE_DIRS})
 
-include_directories(../ECF)
+add_library(ECF STATIC IMPORTED)
+set_target_properties(ECF PROPERTIES
+    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../ECF/build/libECF.a
+    INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/../ECF
+)
 
 add_library(ecf-sr MODULE library.cpp Model.cpp)
 

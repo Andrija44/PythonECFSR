@@ -11,6 +11,7 @@ parameters = """
         </Tree>
     </Genotype>
     <Registry>
+        <Entry key="randomizer.seed">{random_state}</Entry>
         <Entry key="batch.repeats">0</Entry>
         <Entry key="log.level">0</Entry>
         <Entry key="mutation.indprob">{mutation_indprob}</Entry>
@@ -24,8 +25,8 @@ parameters = """
 class ECFTree(ECFBaseRegressor):
     def __init__(self, functionset="+ - * / min max", maxdepth=6, terminalset="1 [-1 1]",
                 mutation_indprob=0.3, population_size=500, term_stagnation=20, term_fitnessval=0,
-                linear_scaling=True):
-        super().__init__(parameters, ModelType.TREE_MODEL)
+                linear_scaling=True, random_state=0):
+        super().__init__(parameters, ModelType.TREE_MODEL, linear_scaling)
         self.functionset = functionset
         self.maxdepth = maxdepth
         self.terminalset = terminalset
@@ -33,7 +34,7 @@ class ECFTree(ECFBaseRegressor):
         self.population_size = population_size
         self.term_stagnation = term_stagnation
         self.term_fitnessval = term_fitnessval
-        self.linear_scaling = linear_scaling
+        self.random_state = random_state
     
     def fit(self, X, y):
         X, y = check_X_y(X, y)

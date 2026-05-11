@@ -1,0 +1,41 @@
+from ecf_sr import ECFTree
+
+parameters = """
+<ECF>
+    <Algorithm>
+        <Elimination>
+            <Entry key="gengap">{gengap}</Entry>
+            <Entry key="selpressure">{selpressure}</Entry>
+        </Elimination>
+    </Algorithm>
+    <Genotype>
+        <Tree>
+            <Entry key="functionset">{functionset}</Entry>
+            <Entry key="maxdepth">{maxdepth}</Entry>
+            <Entry key="terminalset">{real_terminalset}</Entry>
+        </Tree>
+    </Genotype>
+    <Registry>
+        <Entry key="randomizer.seed">{random_state}</Entry>
+        <Entry key="batch.repeats">0</Entry>
+        <Entry key="log.level">0</Entry>
+        <Entry key="mutation.indprob">{mutation_indprob}</Entry>
+        <Entry key="population.size">{population_size}</Entry>
+        <Entry key="term.stagnation">{term_stagnation}</Entry>
+        <Entry key="term.fitnessval">{term_fitnessval}</Entry>
+    </Registry>
+</ECF>
+"""
+
+
+class ECFElimination(ECFTree):
+    def __init__(self, gengap=0.6, selpressure=10,
+                functionset="+ - * / min max", maxdepth=6, terminalset="1 [-1 1]",
+                mutation_indprob=0.3, population_size=500, term_stagnation=20, term_fitnessval=0,
+                linear_scaling=True, random_state=0):
+        super().__init__(functionset, maxdepth, terminalset,
+                        mutation_indprob, population_size, term_stagnation, term_fitnessval,
+                        linear_scaling, random_state)
+        self.parameters = parameters
+        self.gengap = gengap
+        self.selpressure = selpressure
